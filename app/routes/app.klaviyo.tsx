@@ -6,7 +6,7 @@ import { scanThemeAssets } from "../lib/audit/theme-scanner";
 import { auditKlaviyo } from "../lib/audit/klaviyo";
 import { calculateScore } from "../lib/audit/index";
 import type { AuditResult } from "../lib/audit/index";
-import { ScoreCircle, SummaryStats, IssueList } from "../components/audit-ui";
+import { PlatformPageLayout } from "../components/audit-ui";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
@@ -29,53 +29,29 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return { result };
 };
 
+const CHECKS = [
+  "Klaviyo on-site JavaScript (static.klaviyo.com)",
+  "Company ID / Public API Key present",
+  "Duplicate Company IDs",
+  "identify and track event calls",
+];
+
 export default function KlaviyoPage() {
   const { shop } = useLoaderData<typeof loader>();
   const fetcher = useFetcher<typeof action>();
   const isLoading = ["loading", "submitting"].includes(fetcher.state) && fetcher.formMethod === "POST";
-  const result: AuditResult | null = fetcher.data?.result ?? null;
 
   return (
-    <s-page heading="Klaviyo Audit">
-      <s-button
-        slot="primary-action"
-        onClick={() => fetcher.submit({}, { method: "POST" })}
-        {...(isLoading ? { loading: true } : {})}
-      >
-        {isLoading ? "Scanning..." : "Run Klaviyo Audit"}
-      </s-button>
-
-      {!result && !isLoading && (
-        <s-section heading="What we check">
-          <s-paragraph>Scans <strong>{shop}</strong> for Klaviyo on-site tracking issues.</s-paragraph>
-          <s-unordered-list>
-            <s-list-item>Klaviyo on-site JavaScript (static.klaviyo.com)</s-list-item>
-            <s-list-item>Company ID / Public API Key</s-list-item>
-            <s-list-item>Duplicate Company IDs</s-list-item>
-            <s-list-item>identify and track event calls</s-list-item>
-          </s-unordered-list>
-        </s-section>
-      )}
-
-      {isLoading && (
-        <s-section heading="Scanning...">
-          <s-paragraph>Reading theme assets for {shop}.</s-paragraph>
-        </s-section>
-      )}
-
-      {result && !isLoading && (
-        <>
-          <s-section heading="Results">
-            <ScoreCircle score={result.score} />
-            <s-paragraph>
-              Theme: <strong>{result.themeName}</strong> &mdash; {new Date(result.ranAt).toLocaleString()}
-            </s-paragraph>
-            <SummaryStats result={result} />
-          </s-section>
-          <IssueList issues={result.issues} />
-        </>
-      )}
-    </s-page>
+    <PlatformPageLayout
+      heading="Klaviyo Audit"
+      color="#006DFF"
+      buttonLabel="Run Klaviyo Audit"
+      checks={CHECKS}
+      shop={shop}
+      isLoading={isLoading}
+      result={fetcher.data?.result ?? null}
+      onRun={() => fetcher.submit({}, { method: "POST" })}
+    />
   );
 }
 

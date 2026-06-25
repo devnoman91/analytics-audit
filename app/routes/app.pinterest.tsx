@@ -6,7 +6,7 @@ import { scanThemeAssets } from "../lib/audit/theme-scanner";
 import { auditPinterest } from "../lib/audit/pinterest";
 import { calculateScore } from "../lib/audit/index";
 import type { AuditResult } from "../lib/audit/index";
-import { ScoreCircle, SummaryStats, IssueList } from "../components/audit-ui";
+import { PlatformPageLayout } from "../components/audit-ui";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
@@ -29,55 +29,31 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return { result };
 };
 
+const CHECKS = [
+  "Pinterest Tag base code (s.pinimg.com)",
+  "Tag ID via pintrk('load')",
+  "Duplicate Tag IDs",
+  "checkout event on order confirmation",
+  "addtocart event",
+  "pagevisit event for retargeting audiences",
+];
+
 export default function PinterestPage() {
   const { shop } = useLoaderData<typeof loader>();
   const fetcher = useFetcher<typeof action>();
   const isLoading = ["loading", "submitting"].includes(fetcher.state) && fetcher.formMethod === "POST";
-  const result: AuditResult | null = fetcher.data?.result ?? null;
 
   return (
-    <s-page heading="Pinterest Tag Audit">
-      <s-button
-        slot="primary-action"
-        onClick={() => fetcher.submit({}, { method: "POST" })}
-        {...(isLoading ? { loading: true } : {})}
-      >
-        {isLoading ? "Scanning..." : "Run Pinterest Audit"}
-      </s-button>
-
-      {!result && !isLoading && (
-        <s-section heading="What we check">
-          <s-paragraph>Scans <strong>{shop}</strong> for Pinterest Tag setup issues.</s-paragraph>
-          <s-unordered-list>
-            <s-list-item>Pinterest Tag base code (s.pinimg.com)</s-list-item>
-            <s-list-item>Tag ID via pintrk('load')</s-list-item>
-            <s-list-item>Duplicate Tag IDs</s-list-item>
-            <s-list-item>checkout event on order confirmation</s-list-item>
-            <s-list-item>addtocart event</s-list-item>
-            <s-list-item>pagevisit event for retargeting</s-list-item>
-          </s-unordered-list>
-        </s-section>
-      )}
-
-      {isLoading && (
-        <s-section heading="Scanning...">
-          <s-paragraph>Reading theme assets for {shop}.</s-paragraph>
-        </s-section>
-      )}
-
-      {result && !isLoading && (
-        <>
-          <s-section heading="Results">
-            <ScoreCircle score={result.score} />
-            <s-paragraph>
-              Theme: <strong>{result.themeName}</strong> &mdash; {new Date(result.ranAt).toLocaleString()}
-            </s-paragraph>
-            <SummaryStats result={result} />
-          </s-section>
-          <IssueList issues={result.issues} />
-        </>
-      )}
-    </s-page>
+    <PlatformPageLayout
+      heading="Pinterest Tag Audit"
+      color="#E60023"
+      buttonLabel="Run Pinterest Audit"
+      checks={CHECKS}
+      shop={shop}
+      isLoading={isLoading}
+      result={fetcher.data?.result ?? null}
+      onRun={() => fetcher.submit({}, { method: "POST" })}
+    />
   );
 }
 

@@ -6,7 +6,7 @@ import { scanThemeAssets } from "../lib/audit/theme-scanner";
 import { auditSnapchat } from "../lib/audit/snapchat";
 import { calculateScore } from "../lib/audit/index";
 import type { AuditResult } from "../lib/audit/index";
-import { ScoreCircle, SummaryStats, IssueList } from "../components/audit-ui";
+import { PlatformPageLayout } from "../components/audit-ui";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
@@ -29,55 +29,31 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return { result };
 };
 
+const CHECKS = [
+  "Snapchat Pixel base code (sc-static.net)",
+  "Pixel ID via snaptr('init')",
+  "Duplicate Pixel IDs",
+  "PURCHASE event on order confirmation",
+  "ADD_CART event",
+  "START_CHECKOUT event",
+];
+
 export default function SnapchatPage() {
   const { shop } = useLoaderData<typeof loader>();
   const fetcher = useFetcher<typeof action>();
   const isLoading = ["loading", "submitting"].includes(fetcher.state) && fetcher.formMethod === "POST";
-  const result: AuditResult | null = fetcher.data?.result ?? null;
 
   return (
-    <s-page heading="Snapchat Pixel Audit">
-      <s-button
-        slot="primary-action"
-        onClick={() => fetcher.submit({}, { method: "POST" })}
-        {...(isLoading ? { loading: true } : {})}
-      >
-        {isLoading ? "Scanning..." : "Run Snapchat Audit"}
-      </s-button>
-
-      {!result && !isLoading && (
-        <s-section heading="What we check">
-          <s-paragraph>Scans <strong>{shop}</strong> for Snapchat Pixel setup issues.</s-paragraph>
-          <s-unordered-list>
-            <s-list-item>Snapchat Pixel base code (sc-static.net)</s-list-item>
-            <s-list-item>Pixel ID via snaptr('init')</s-list-item>
-            <s-list-item>Duplicate Pixel IDs</s-list-item>
-            <s-list-item>PURCHASE event on order confirmation</s-list-item>
-            <s-list-item>ADD_CART event</s-list-item>
-            <s-list-item>START_CHECKOUT event</s-list-item>
-          </s-unordered-list>
-        </s-section>
-      )}
-
-      {isLoading && (
-        <s-section heading="Scanning...">
-          <s-paragraph>Reading theme assets for {shop}.</s-paragraph>
-        </s-section>
-      )}
-
-      {result && !isLoading && (
-        <>
-          <s-section heading="Results">
-            <ScoreCircle score={result.score} />
-            <s-paragraph>
-              Theme: <strong>{result.themeName}</strong> &mdash; {new Date(result.ranAt).toLocaleString()}
-            </s-paragraph>
-            <SummaryStats result={result} />
-          </s-section>
-          <IssueList issues={result.issues} />
-        </>
-      )}
-    </s-page>
+    <PlatformPageLayout
+      heading="Snapchat Pixel Audit"
+      color="#FFCD00"
+      buttonLabel="Run Snapchat Audit"
+      checks={CHECKS}
+      shop={shop}
+      isLoading={isLoading}
+      result={fetcher.data?.result ?? null}
+      onRun={() => fetcher.submit({}, { method: "POST" })}
+    />
   );
 }
 

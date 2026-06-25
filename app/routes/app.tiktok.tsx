@@ -6,7 +6,7 @@ import { scanThemeAssets } from "../lib/audit/theme-scanner";
 import { auditTikTok } from "../lib/audit/tiktok";
 import { calculateScore } from "../lib/audit/index";
 import type { AuditResult } from "../lib/audit/index";
-import { ScoreCircle, SummaryStats, IssueList } from "../components/audit-ui";
+import { PlatformPageLayout } from "../components/audit-ui";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
@@ -29,55 +29,31 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return { result };
 };
 
+const CHECKS = [
+  "TikTok Pixel base code (analytics.tiktok.com)",
+  "Pixel ID loaded via ttq.load()",
+  "Duplicate Pixel IDs",
+  "CompletePayment event on order confirmation",
+  "AddToCart event",
+  "InitiateCheckout event",
+];
+
 export default function TikTokPage() {
   const { shop } = useLoaderData<typeof loader>();
   const fetcher = useFetcher<typeof action>();
   const isLoading = ["loading", "submitting"].includes(fetcher.state) && fetcher.formMethod === "POST";
-  const result: AuditResult | null = fetcher.data?.result ?? null;
 
   return (
-    <s-page heading="TikTok Pixel Audit">
-      <s-button
-        slot="primary-action"
-        onClick={() => fetcher.submit({}, { method: "POST" })}
-        {...(isLoading ? { loading: true } : {})}
-      >
-        {isLoading ? "Scanning..." : "Run TikTok Audit"}
-      </s-button>
-
-      {!result && !isLoading && (
-        <s-section heading="What we check">
-          <s-paragraph>Scans <strong>{shop}</strong> for TikTok Pixel setup issues.</s-paragraph>
-          <s-unordered-list>
-            <s-list-item>TikTok Pixel base code (analytics.tiktok.com)</s-list-item>
-            <s-list-item>Pixel ID loaded via ttq.load()</s-list-item>
-            <s-list-item>Duplicate Pixel IDs</s-list-item>
-            <s-list-item>CompletePayment event on order confirmation</s-list-item>
-            <s-list-item>AddToCart event</s-list-item>
-            <s-list-item>InitiateCheckout event</s-list-item>
-          </s-unordered-list>
-        </s-section>
-      )}
-
-      {isLoading && (
-        <s-section heading="Scanning...">
-          <s-paragraph>Reading theme assets for {shop}.</s-paragraph>
-        </s-section>
-      )}
-
-      {result && !isLoading && (
-        <>
-          <s-section heading="Results">
-            <ScoreCircle score={result.score} />
-            <s-paragraph>
-              Theme: <strong>{result.themeName}</strong> &mdash; {new Date(result.ranAt).toLocaleString()}
-            </s-paragraph>
-            <SummaryStats result={result} />
-          </s-section>
-          <IssueList issues={result.issues} />
-        </>
-      )}
-    </s-page>
+    <PlatformPageLayout
+      heading="TikTok Pixel Audit"
+      color="#2D2D2D"
+      buttonLabel="Run TikTok Audit"
+      checks={CHECKS}
+      shop={shop}
+      isLoading={isLoading}
+      result={fetcher.data?.result ?? null}
+      onRun={() => fetcher.submit({}, { method: "POST" })}
+    />
   );
 }
 
