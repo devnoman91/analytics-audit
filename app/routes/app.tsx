@@ -18,7 +18,14 @@ export default function App() {
   return (
     <AppProvider embedded apiKey={apiKey}>
       <s-app-nav>
-        <s-link href="/app">Audit</s-link>
+        <s-link href="/app">Dashboard</s-link>
+        <s-link href="/app/ga4">GA4</s-link>
+        <s-link href="/app/meta">Meta Pixel</s-link>
+        <s-link href="/app/tiktok">TikTok</s-link>
+        <s-link href="/app/snapchat">Snapchat</s-link>
+        <s-link href="/app/pinterest">Pinterest</s-link>
+        <s-link href="/app/google-ads">Google Ads</s-link>
+        <s-link href="/app/klaviyo">Klaviyo</s-link>
       </s-app-nav>
       <Outlet />
     </AppProvider>

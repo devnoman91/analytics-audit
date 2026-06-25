@@ -2,6 +2,11 @@ import { scanThemeAssets } from "./theme-scanner";
 import { auditGA4 } from "./ga4";
 import { auditMetaPixel } from "./meta-pixel";
 import { auditWebPixels } from "./web-pixels";
+import { auditTikTok } from "./tiktok";
+import { auditSnapchat } from "./snapchat";
+import { auditPinterest } from "./pinterest";
+import { auditGoogleAds } from "./google-ads";
+import { auditKlaviyo } from "./klaviyo";
 
 export type Severity = "critical" | "warning" | "info";
 
@@ -24,7 +29,7 @@ export interface AuditResult {
   ranAt: string;
 }
 
-function calculateScore(issues: AuditIssue[]): number {
+export function calculateScore(issues: AuditIssue[]): number {
   let penalty = 0;
   for (const issue of issues) {
     if (issue.severity === "critical") penalty += 25;
@@ -42,7 +47,21 @@ export async function runAudit(admin: any, shop: string): Promise<AuditResult> {
 
   const ga4Issues = auditGA4(themeResult.assets);
   const metaIssues = auditMetaPixel(themeResult.assets);
-  const allIssues = [...ga4Issues, ...metaIssues, ...webPixelsResult.issues];
+  const tiktokIssues = auditTikTok(themeResult.assets);
+  const snapchatIssues = auditSnapchat(themeResult.assets);
+  const pinterestIssues = auditPinterest(themeResult.assets);
+  const googleAdsIssues = auditGoogleAds(themeResult.assets);
+  const klaviyoIssues = auditKlaviyo(themeResult.assets);
+  const allIssues = [
+    ...ga4Issues,
+    ...metaIssues,
+    ...tiktokIssues,
+    ...snapchatIssues,
+    ...pinterestIssues,
+    ...googleAdsIssues,
+    ...klaviyoIssues,
+    ...webPixelsResult.issues,
+  ];
 
   return {
     shop,
