@@ -3,6 +3,9 @@ primary_region = "ord"
 
 [build]
 
+[deploy]
+  release_command = "prisma migrate deploy"
+
 [env]
   PORT = "3000"
   NODE_ENV = "production"
@@ -19,7 +22,7 @@ primary_region = "ord"
   processes = ["app"]
 
 [processes]
-  app = "npm run docker-start"
+  app = "npm run start"
 
 [[vm]]
   memory = "1gb"
