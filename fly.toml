@@ -4,7 +4,7 @@ primary_region = "ord"
 [build]
 
 [deploy]
-  release_command = "prisma migrate deploy"
+  release_command = "node_modules/.bin/prisma migrate deploy"
 
 [env]
   PORT = "3000"
