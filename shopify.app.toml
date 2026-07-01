@@ -2,7 +2,7 @@
 
 client_id = "c3119635baccd8eaa8b92a8b10788f24"
 name = "analytics-audit"
-application_url = "https://example.com"
+application_url = "https://analytics-audit.fly.dev"
 embedded = true
 
 [access_scopes]
@@ -21,7 +21,11 @@ api_version = "2026-07"
   topics = [ "app/scopes_update" ]
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [
+  "https://analytics-audit.fly.dev/auth/callback",
+  "https://analytics-audit.fly.dev/auth/shopify/callback",
+  "https://analytics-audit.fly.dev/api/auth/callback"
+]
 
 [build]
 include_config_on_deploy = true

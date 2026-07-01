@@ -16,7 +16,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const result = await runAudit(admin, session.shop);
   return { result };
 };
-
+ 
 const PLATFORMS = [
   { name: "GA4",          short: "Google Analytics 4",  href: "/app/ga4",        color: "#E8710A", checks: 6 },
   { name: "Meta Pixel",   short: "Facebook / Instagram", href: "/app/meta",       color: "#1877F2", checks: 6 },
@@ -68,7 +68,8 @@ export default function Index() {
         {!result && !isLoading && (
           <div
             style={{
-              background: "linear-gradient(135deg, #0F172A 0%, #1E3A5F 100%)",
+              background: "#fff",
+              border: "1px solid #E2E8F0",
               borderRadius: 16,
               padding: "36px 32px",
               marginBottom: 28,
@@ -77,30 +78,31 @@ export default function Index() {
               justifyContent: "space-between",
               gap: 24,
               flexWrap: "wrap",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
             }}
           >
             <div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "#fff", marginBottom: 8 }}>
+              <div style={{ fontSize: 22, fontWeight: 800, color: "#0F172A", marginBottom: 8 }}>
                 Check your entire tracking setup
               </div>
-              <div style={{ fontSize: 13, color: "#94A3B8", lineHeight: 1.7, maxWidth: 380 }}>
+              <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.7, maxWidth: 380 }}>
                 Scan GA4, Meta, TikTok, Snapchat, Pinterest, Google Ads &amp; Klaviyo
-                on <strong style={{ color: "#CBD5E1" }}>{shop}</strong> — all at once.
+                on <strong style={{ color: "#0F172A" }}>{shop}</strong> — all at once.
               </div>
             </div>
             <button
               onClick={() => fetcher.submit({}, { method: "POST" })}
               style={{
-                background: "#fff",
-                color: "#0F172A",
+                background: "#2563EB",
+                color: "#fff",
                 border: "none",
                 borderRadius: 10,
                 padding: "13px 28px",
                 fontSize: 14,
-                fontWeight: 800,
+                fontWeight: 700,
                 cursor: "pointer",
                 whiteSpace: "nowrap",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
+                boxShadow: "0 2px 8px rgba(37,99,235,0.25)",
               }}
             >
               Run Full Audit
@@ -112,25 +114,27 @@ export default function Index() {
         {isLoading && (
           <div
             style={{
-              background: "linear-gradient(135deg, #0F172A 0%, #1E3A5F 100%)",
+              background: "#fff",
+              border: "1px solid #E2E8F0",
               borderRadius: 16,
               padding: "44px 32px",
               marginBottom: 28,
               textAlign: "center",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
             }}
           >
             <div
               style={{
                 width: 40,
                 height: 40,
-                border: "3px solid rgba(255,255,255,0.2)",
-                borderTop: "3px solid #fff",
+                border: "3px solid #E2E8F0",
+                borderTop: "3px solid #2563EB",
                 borderRadius: "50%",
                 animation: "spin 0.8s linear infinite",
                 margin: "0 auto 16px",
               }}
             />
-            <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>Scanning all platforms…</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>Scanning all platforms…</div>
             <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 6 }}>{shop}</div>
           </div>
         )}
@@ -139,7 +143,8 @@ export default function Index() {
         {result && !isLoading && (
           <div
             style={{
-              background: "linear-gradient(135deg, #0F172A 0%, #1E3A5F 100%)",
+              background: "#fff",
+              border: "1px solid #E2E8F0",
               borderRadius: 16,
               padding: "28px 32px",
               marginBottom: 28,
@@ -147,6 +152,7 @@ export default function Index() {
               alignItems: "center",
               gap: 32,
               flexWrap: "wrap",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
             }}
           >
             {/* Score */}
@@ -156,19 +162,19 @@ export default function Index() {
                   width: 88,
                   height: 88,
                   borderRadius: "50%",
-                  border: `6px solid ${result.score >= 80 ? "#34D399" : result.score >= 50 ? "#FBBF24" : "#F87171"}`,
+                  border: `6px solid ${result.score >= 80 ? "#22C55E" : result.score >= 50 ? "#F59E0B" : "#EF4444"}`,
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: "rgba(255,255,255,0.05)",
+                  background: "#F8FAFC",
                   margin: "0 auto 8px",
                 }}
               >
-                <span style={{ fontSize: 28, fontWeight: 800, color: "#fff", lineHeight: 1 }}>{result.score}</span>
-                <span style={{ fontSize: 10, color: "#64748B", marginTop: 1 }}>/100</span>
+                <span style={{ fontSize: 28, fontWeight: 800, color: "#0F172A", lineHeight: 1 }}>{result.score}</span>
+                <span style={{ fontSize: 10, color: "#94A3B8", marginTop: 1 }}>/100</span>
               </div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", letterSpacing: 0.6 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: 0.6 }}>
                 Health Score
               </div>
             </div>
@@ -176,9 +182,9 @@ export default function Index() {
             {/* Stats */}
             <div style={{ display: "flex", gap: 16, flex: 1, flexWrap: "wrap" }}>
               {[
-                { label: "Critical", count: criticalIssues.length, color: "#F87171" },
-                { label: "Warnings", count: warningIssues.length,  color: "#FBBF24" },
-                { label: "Info",     count: infoIssues.length,     color: "#60A5FA" },
+                { label: "Critical", count: criticalIssues.length, color: "#EF4444" },
+                { label: "Warnings", count: warningIssues.length,  color: "#F59E0B" },
+                { label: "Info",     count: infoIssues.length,     color: "#3B82F6" },
               ].map((s) => (
                 <div key={s.label} style={{ textAlign: "center" }}>
                   <div style={{ fontSize: 32, fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.count}</div>
@@ -192,15 +198,15 @@ export default function Index() {
               <div style={{ fontSize: 11, color: "#64748B", marginBottom: 4 }}>
                 {result.themeName}
               </div>
-              <div style={{ fontSize: 11, color: "#475569", marginBottom: 14 }}>
+              <div style={{ fontSize: 11, color: "#94A3B8", marginBottom: 14 }}>
                 {new Date(result.ranAt).toLocaleString()}
               </div>
               <button
                 onClick={() => fetcher.submit({}, { method: "POST" })}
                 style={{
-                  background: "rgba(255,255,255,0.1)",
-                  color: "#fff",
-                  border: "1px solid rgba(255,255,255,0.2)",
+                  background: "#F1F5F9",
+                  color: "#0F172A",
+                  border: "1px solid #E2E8F0",
                   borderRadius: 8,
                   padding: "7px 16px",
                   fontSize: 12,
